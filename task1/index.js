@@ -21,12 +21,16 @@ parameters = [
     {
         displayName: 'Precipitation',
         value: 'precipitation'
+    },
+    {
+        displayName: '',
+        value: 'weatherIcon'
     }];
 
 cleanWeatherData = [];
 
 async function getWeatherData() {
-    let res = await fetch('https://api.met.no/weatherapi/locationforecast/2.0/complete?lat=60.3913&lon=5.3221');
+    let res = await fetch('https://api.met.no/weatherapi/locationforecast/2.0?lat=-13.9833&lon=33.7833');
     let data = await res.json();
     return data;
 }
@@ -35,13 +39,18 @@ getWeatherData().then(
     weatherData => {
         weatherData.properties.timeseries.forEach(element => {
             date = new Date(element.time)
+            let options = { weekday: 'short', month: 'short', day: 'numeric'};
 
             cleanWeatherData.push({
-                time: (date.getDate),
+                time: (
+                    date.toLocaleDateString('en-US', options)
+                    + " " +
+                    date.toLocaleTimeString('en-US',{hour12: false, hour: "numeric", minute: "numeric"})),
                 air_temperature: element.data.instant.details.air_temperature,
                 wind_speed: element.data.instant.details.wind_speed,
                 humidity: element.data.instant.details.relative_humidity,
-                precipitation: getPrecipitation(element)               
+                precipitation: getPrecipitation(element),
+                weatherIcon: getWeatherIcon(element),
             })
         });
 
@@ -49,7 +58,7 @@ getWeatherData().then(
     }
 )
 
-function createHTMLTable(){
+function createHTMLTable() {
     console.log("Creating HTML Table")
     console.log(cleanWeatherData)
     weatherTable = document.createElement('table');
@@ -68,7 +77,7 @@ function createHTMLTable(){
 
     cleanWeatherData.forEach(element => {
         weatherValues = document.createElement('tr');
-        
+
         parameters.forEach((parameter) => {
             td = document.createElement('td');
             td.appendChild(document.createTextNode(element[parameter.value]));
@@ -81,16 +90,24 @@ function createHTMLTable(){
     weatherTable.appendChild(tableBody)
 }
 
-function getPrecipitation(json){
+function getPrecipitation(json) {
     console.log(json)
-    if(json.data.next_1_hours != undefined){
+    if (json.data.next_1_hours != undefined) {
         return json.data.next_1_hours.details.precipitation_amount;
     }
-    if(json.data.next_6_hours != undefined){
+    if (json.data.next_6_hours != undefined) {
         return json.data.next_6_hours.details.precipitation_amount;
     }
     return "";
-}
+};
 
-let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+function getWeatherIcon(json) {
+    if (json.data.next_1_hours != undefined) {
+        return json.data.next_1_hours.summary.symbol_code;
+    }
+    if (json.data.next_6_hours != undefined) {
+        return json.data.next_6_hours.summary.symbol_code;
+    }
+
+    return "";
+}
