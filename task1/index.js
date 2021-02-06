@@ -26,39 +26,41 @@ parameters = [
 
 cleanWeatherData = [];
 
-async function getWeatherData() {
-    let res = await fetch('https://api.met.no/weatherapi/locationforecast/2.0?lat=-13.9833&lon=33.7833');
+cities = [
+    {
+        "cityName": "Bergen",
+        "lat": 60.39,
+        "lon": 5.32
+    },
+    {
+        "cityName": "Oslo",
+        "lat": 59.91,
+        "lon": 10.75
+    },
+    {
+        "cityName": "Trondheim",
+        "lat": 63.4,
+        "lon": 10.39
+    },
+    {
+        "cityName": "Stavanger",
+        "lat": 58.97,
+        "lon": 5.73
+    },
+    {
+        "cityName": "Bodø",
+        "lat": 67.28,
+        "lon": 14.41
+    }
+]
+
+async function getWeatherData(lat_lon) {
+    let res = await fetch(`https://api.met.no/weatherapi/locationforecast/2.0?${lat_lon}`);
     let data = await res.json();
     return data;
 }
 
-getWeatherData().then(
-    weatherData => {
-        weatherData.properties.timeseries.forEach(element => {
-            date = new Date(element.time)
-
-            cleanWeatherData.push({
-                time: (
-                    date.toLocaleDateString('en-US', {weekday: 'short', month: 'short', day: 'numeric'})
-                    + " " +
-                    date.toLocaleTimeString('en-US',{hour12: false, hour: "numeric", minute: "numeric"})),
-                air_temperature: element.data.instant.details.air_temperature,
-                wind_speed: element.data.instant.details.wind_speed,
-                wind_direction: element.data.instant.details.wind_from_direction,
-                humidity: element.data.instant.details.relative_humidity,
-                precipitation: getPrecipitation(element),
-                weatherIcon: getWeatherIcon(element),
-            })
-        });
-
-        createFlexGrid();
-        createHTMLTable();
-    }
-)
-
-function createHTMLTable() {
-    //console.log("Creating HTML Table")
-    console.log(cleanWeatherData)
+function createHTMLTable() {  
     weatherTable = document.createElement('table');
     weatherTable.id = 'table'
 
@@ -79,8 +81,13 @@ function createHTMLTable() {
 
         parameters.forEach((parameter) => {
             td = document.createElement('td');
-            td.appendChild(document.createTextNode(element[parameter.value]));
-            weatherValues.appendChild(td);
+            
+            if(parameter.value == 'weatherIcon') {
+                createWeatherIconElement(element.weatherIcon,weatherValues);
+            } else {
+                td.appendChild(document.createTextNode(element[parameter.value]));
+                weatherValues.appendChild(td);
+            }
         });
 
         tableBody.appendChild(weatherValues)
@@ -170,5 +177,64 @@ function toggleDisplayMode(){
     } else {
         flexgrid.style.display = 'flex';
         table.style.display = 'none';
+    }
+}
+
+function createDropdownList(){
+    parentSelector = document.getElementById('citySelector');
+
+    cities.forEach(city => {
+        option = document.createElement('option');
+        option.textContent = city.cityName;
+        option.value = `lat=${city.lat}&lon=${city.lon}`
+
+        parentSelector.appendChild(option);
+    });
+}
+
+window.onload = function(){
+    createDropdownList();
+    getWeatherForCity();
+}
+
+function getWeatherForCity(){
+    lat_lon = document.getElementById('citySelector').value;
+    console.log(lat_lon);
+
+    clearTableAndFlex();
+
+    getWeatherData(lat_lon).then(
+        weatherData => {
+            weatherData.properties.timeseries.forEach(element => {
+                date = new Date(element.time)
+    
+                cleanWeatherData.push({
+                    time: (
+                        date.toLocaleDateString('en-US', {weekday: 'short', month: 'short', day: 'numeric'})
+                        + " " +
+                        date.toLocaleTimeString('en-US',{hour12: false, hour: "numeric", minute: "numeric"})),
+                    air_temperature: element.data.instant.details.air_temperature,
+                    wind_speed: element.data.instant.details.wind_speed,
+                    wind_direction: element.data.instant.details.wind_from_direction,
+                    humidity: element.data.instant.details.relative_humidity,
+                    precipitation: getPrecipitation(element),
+                    weatherIcon: getWeatherIcon(element),
+                })
+            });
+    
+            createFlexGrid();
+            createHTMLTable();
+        }
+    )
+}
+
+function clearTableAndFlex(){
+    table = document.getElementById('table')
+    flexgrid = document.getElementById('flexgrid')
+    if(table !== null){
+        table.remove();
+    }
+    if(flexgrid !== null){
+        flexgrid.remove();
     }
 }
