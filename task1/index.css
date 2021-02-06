@@ -2,3 +2,17 @@ body {
     color: white;
     background-color: black;
 }
+
+.flexgrid {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.flexgrid div {
+    border: 1px solid red;
+    width: 200px;
+}
+
+.weatherIcon {
+    width: 64px;
+}
