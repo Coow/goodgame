@@ -1,18 +1,48 @@
 body {
-    color: white;
-    background-color: black;
+    color: rgb(208, 204, 198);
+    background-color: rgb(24, 26, 27);
 }
 
-.flexgrid {
+#flexgrid {
     display: flex;
     flex-wrap: wrap;
 }
+#table {
+    display: none;
+}
 
-.flexgrid div {
-    border: 1px solid red;
+.weatherDisplay {
     width: 200px;
+    padding: 0px 10px;
+    margin: 10px;
+    border: 1px solid rgb(208, 204, 198);
+}
+
+
+.weatherDisplay h4 {
+    float: left;
+}
+
+.temperature, .windSpeed {
+    width: 50%;
+}
+
+.humidity, .precipitation {
+    margin-bottom: 5px;
+    margin-top: 5px;
+    width: 100%;
 }
 
 .weatherIcon {
-    width: 64px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    width: 80%;
 }
+
+.time {
+    text-align: center;
+    border-bottom: 1px solid white;
+}
+

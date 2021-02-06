@@ -1,6 +1,3 @@
-console.log("Starting")
-document.write(Date())
-
 parameters = [
     {
         displayName: 'Time',
@@ -63,7 +60,7 @@ function createHTMLTable() {
     //console.log("Creating HTML Table")
     console.log(cleanWeatherData)
     weatherTable = document.createElement('table');
-    weatherTable.className = 'table'
+    weatherTable.id = 'table'
 
     document.body.appendChild(weatherTable);
 
@@ -95,29 +92,31 @@ function createHTMLTable() {
 
 function createFlexGrid(){
     parentDiv = document.createElement('div');
-    parentDiv.className = "flexgrid";
+    parentDiv.id = "flexgrid";
+    parentDiv.style.display = 'flex'
     document.body.appendChild(parentDiv);
 
     cleanWeatherData.forEach(element => {
         displayDiv = document.createElement('div');
+        displayDiv.className = 'weatherDisplay'
         parentDiv.appendChild(displayDiv);
 
-        createTextElement('h3', element.time, displayDiv, 'time');
-        createTextElement('h4', element.air_temperature + ' °C', displayDiv, 'temperatue');
-        createTextElement('h4', element.wind_speed, displayDiv, 'windSpeed');
-        createTextElement('h4', element.wind_direction, displayDiv, 'windDirection');
-        createTextElement('h4', element.humidity, displayDiv, 'humidity');
-        createTextElement('h4', element.precipitation, displayDiv, 'precipitation');
+        createTextElement('h2', element.time, displayDiv, 'time');
 
-        var imgElement = document.createElement('img');
-        imgElement.setAttribute('src', `weather_icons/${element.weatherIcon}.png`);
-        imgElement.className = 'weatherIcon'
-        displayDiv.appendChild(imgElement);
+        createWeatherIconElement(element.weatherIcon,displayDiv);
+
+        createTextElement('h4', `${element.air_temperature} °C`, displayDiv, 'temperature');
+        createTextElement('h4', `${element.wind_speed} m/s`, displayDiv, 'windSpeed');
+
+        //Probably take the wind direction and rotate a arrow icon that much
+        //createTextElement('h4', element.wind_direction, displayDiv, 'windDirection');
+
+        createTextElement('h4', `Humidity: ${element.humidity}%`, displayDiv, 'humidity');
+        createTextElement('h4', `Precipitation: ${element.precipitation}%`, displayDiv, 'precipitation');
     });
 }
 
 function getPrecipitation(json) {
-    console.log(json)
     if (json.data.next_1_hours != undefined) {
         return json.data.next_1_hours.details.precipitation_amount;
     }
@@ -148,4 +147,28 @@ function createTextElement(elementType, elementValue, parent, className){
 
     element.appendChild(value);
     parent.appendChild(element);
+}
+
+function createWeatherIconElement(weatherIcon, parent){
+    var imgElement = document.createElement('img');
+    //Edge case if the WeatherData didnt have a WeatherIcon
+    if(weatherIcon == ""){
+        return;
+    }
+    imgElement.setAttribute('src', `weather_icons/${weatherIcon}.png`);
+    imgElement.className = 'weatherIcon'
+    parent.appendChild(imgElement);
+}
+
+function toggleDisplayMode(){
+    flexgrid = document.getElementById('flexgrid');
+    table = document.getElementById('table');
+
+    if(flexgrid.style.display == 'flex') {
+        flexgrid.style.display = 'none';
+        table.style.display = 'block';
+    } else {
+        flexgrid.style.display = 'flex';
+        table.style.display = 'none';
+    }
 }
