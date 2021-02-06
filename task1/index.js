@@ -144,7 +144,7 @@ function getWeatherIcon(json) {
     return "";
 }
 
-//Create a HTML element with text value and a class
+//Create a HTML element with text value and a class with a chosen parent, and optional className
 function createTextElement(elementType, elementValue, parent, className){
     element = document.createElement(elementType);
     value = document.createTextNode(elementValue);
@@ -156,6 +156,7 @@ function createTextElement(elementType, elementValue, parent, className){
     parent.appendChild(element);
 }
 
+//Creates the weather icon element, with a chosen parent
 function createWeatherIconElement(weatherIcon, parent){
     var imgElement = document.createElement('img');
     //Edge case if the WeatherData didnt have a WeatherIcon
@@ -167,6 +168,7 @@ function createWeatherIconElement(weatherIcon, parent){
     parent.appendChild(imgElement);
 }
 
+//Toggles between Grid view, and table list view
 function toggleDisplayMode(){
     flexgrid = document.getElementById('flexgrid');
     table = document.getElementById('table');
@@ -180,6 +182,7 @@ function toggleDisplayMode(){
     }
 }
 
+//Creates the dropdow
 function createDropdownList(){
     parentSelector = document.getElementById('citySelector');
 
@@ -192,15 +195,18 @@ function createDropdownList(){
     });
 }
 
+//Calls the functions after the page is done loading
 window.onload = function(){
     createDropdownList();
     getWeatherForCity();
 }
 
+//Gets weather for the selected city in the dropdown menu
 function getWeatherForCity(){
     lat_lon = document.getElementById('citySelector').value;
     console.log(lat_lon);
 
+    //Clears the elements
     clearTableAndFlex();
 
     getWeatherData(lat_lon).then(
@@ -228,6 +234,7 @@ function getWeatherForCity(){
     )
 }
 
+//Clears the table and flexgrid for new city
 function clearTableAndFlex(){
     table = document.getElementById('table')
     flexgrid = document.getElementById('flexgrid')
