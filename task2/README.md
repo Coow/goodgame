@@ -21,3 +21,6 @@
 ### Running
 `node index.js`
 Saves output to `games.json`
+
+Output can be viewed https://goodgame.mrcow.xyz/games.json
+Updates every hour
