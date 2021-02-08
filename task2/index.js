@@ -7,7 +7,7 @@ var games = []
 const maxPrice = 90;
 
 //URL generated on the store page it self, using filters and settings described in the task
-const url = `https://store.steampowered.com/search/?sort_by=Reviews_DESC&maxprice=${maxPrice}&tags=5350&category1=998&supportedlang=norwegian`
+const url = `https://store.steampowered.com/search/?sort_by=Reviews_DESC&maxprice=${maxPrice}&tags=5350&category1=998&supportedlang=norwegian`;
 
 //https://github.com/chenxiaochun/blog/issues/38
 async function autoScroll(page) {
@@ -55,20 +55,20 @@ async function autoScroll(page) {
                 return;
             }
 
-            review_summary = $(game).find('.search_review_summary').attr('class').replace('search_review_summary ', '')
+            review_summary = $(game).find('.search_review_summary').attr('class').replace('search_review_summary ', '');
 
             if (review_summary != 'positive') {
                 return;
             }
 
             //Gets the image for the game
-            image = $(game).find('.search_capsule').find('img').attr('src')
+            image = $(game).find('.search_capsule').find('img').attr('src');
 
             //Gets the price for the game
             var originalPrice, discountPrice, discount = "";
 
             //Regex for removing return, newline and tab, aswell as spaces before and after the price tag
-            const regex = /[ \r\n\t]+[ ]/g
+            const regex = /[ \r\n\t]+[ ]/g;
 
             //If the length is 0, it means its not discounted
             if ($(game).find('.search_price').children().length == 0) {

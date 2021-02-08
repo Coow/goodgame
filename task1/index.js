@@ -90,7 +90,7 @@ function createHTMLTable() {
             }
         });
 
-        tableBody.appendChild(weatherValues)
+        tableBody.appendChild(weatherValues);
     });
 
     weatherTable.appendChild(tableBody);
@@ -100,12 +100,12 @@ function createHTMLTable() {
 function createFlexGrid() {
     parentDiv = document.createElement('div');
     parentDiv.id = "flexgrid";
-    parentDiv.style.display = 'flex'
+    parentDiv.style.display = 'flex';
     document.body.appendChild(parentDiv);
 
     cleanWeatherData.forEach(element => {
         displayDiv = document.createElement('div');
-        displayDiv.className = 'weatherDisplay'
+        displayDiv.className = 'weatherDisplay';
         parentDiv.appendChild(displayDiv);
 
         createTextElement('h2', element.time, displayDiv, 'time');
@@ -164,7 +164,7 @@ function createWeatherIconElement(weatherIcon, parent) {
         return;
     }
     imgElement.setAttribute('src', `weather_icons/${weatherIcon}.png`);
-    imgElement.className = 'weatherIcon'
+    imgElement.className = 'weatherIcon';
     parent.appendChild(imgElement);
 }
 
@@ -189,7 +189,7 @@ function createDropdownList() {
     cities.forEach(city => {
         option = document.createElement('option');
         option.textContent = city.cityName;
-        option.value = `lat=${city.lat}&lon=${city.lon}`
+        option.value = `lat=${city.lat}&lon=${city.lon}`;
 
         parentSelector.appendChild(option);
     });
@@ -209,7 +209,6 @@ window.onload = function () {
 //Gets weather for the selected city in the dropdown menu
 function getWeatherForCity() {
     lat_lon = document.getElementById('citySelector').value;
-    console.log(lat_lon);
 
     //Clears the elements
     clearTableAndFlex();
@@ -219,7 +218,7 @@ function getWeatherForCity() {
     getWeatherData(lat_lon).then(
         weatherData => {
             for (let element of weatherData.properties.timeseries) {
-                date = new Date(element.time)
+                date = new Date(element.time);
 
                 //If the date is larger than next week (today + 7 days), break the loop
                 if (date > nextWeek()) {
