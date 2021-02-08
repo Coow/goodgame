@@ -15,3 +15,4 @@ Add it as an object to the array, using this as a template
 
 ### Running
 Served as a static webpage
+Avaliable to view at https://goodgame.mrcow.xyz
