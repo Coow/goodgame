@@ -1,4 +1,4 @@
-parameters = [
+const parameters = [
     {
         displayName: 'Time',
         value: 'time'
@@ -24,9 +24,7 @@ parameters = [
         value: 'weatherIcon'
     }];
 
-cleanWeatherData = [];
-
-cities = [
+const cities = [
     {
         "cityName": "Bergen",
         "lat": 60.39,
@@ -54,13 +52,15 @@ cities = [
     }
 ]
 
+cleanWeatherData = [];
+
 async function getWeatherData(lat_lon) {
     let res = await fetch(`https://api.met.no/weatherapi/locationforecast/2.0?${lat_lon}`);
     let data = await res.json();
     return data;
 }
 
-function createHTMLTable() {  
+function createHTMLTable() {
     weatherTable = document.createElement('table');
     weatherTable.id = 'table'
 
@@ -81,9 +81,9 @@ function createHTMLTable() {
 
         parameters.forEach((parameter) => {
             td = document.createElement('td');
-            
-            if(parameter.value == 'weatherIcon') {
-                createWeatherIconElement(element.weatherIcon,weatherValues);
+
+            if (parameter.value == 'weatherIcon') {
+                createWeatherIconElement(element.weatherIcon, weatherValues);
             } else {
                 td.appendChild(document.createTextNode(element[parameter.value]));
                 weatherValues.appendChild(td);
@@ -97,7 +97,7 @@ function createHTMLTable() {
     return;
 }
 
-function createFlexGrid(){
+function createFlexGrid() {
     parentDiv = document.createElement('div');
     parentDiv.id = "flexgrid";
     parentDiv.style.display = 'flex'
@@ -110,7 +110,7 @@ function createFlexGrid(){
 
         createTextElement('h2', element.time, displayDiv, 'time');
 
-        createWeatherIconElement(element.weatherIcon,displayDiv);
+        createWeatherIconElement(element.weatherIcon, displayDiv);
 
         createTextElement('h4', `${element.air_temperature} °C`, displayDiv, 'temperature');
         createTextElement('h4', `${element.wind_speed} m/s`, displayDiv, 'windSpeed');
@@ -145,10 +145,10 @@ function getWeatherIcon(json) {
 }
 
 //Create a HTML element with text value and a class with a chosen parent, and optional className
-function createTextElement(elementType, elementValue, parent, className){
+function createTextElement(elementType, elementValue, parent, className) {
     element = document.createElement(elementType);
     value = document.createTextNode(elementValue);
-    if(className != undefined) {
+    if (className != undefined) {
         element.className = className;
     }
 
@@ -157,10 +157,10 @@ function createTextElement(elementType, elementValue, parent, className){
 }
 
 //Creates the weather icon element, with a chosen parent
-function createWeatherIconElement(weatherIcon, parent){
+function createWeatherIconElement(weatherIcon, parent) {
     var imgElement = document.createElement('img');
     //Edge case if the WeatherData didnt have a WeatherIcon
-    if(weatherIcon == ""){
+    if (weatherIcon == "") {
         return;
     }
     imgElement.setAttribute('src', `weather_icons/${weatherIcon}.png`);
@@ -169,11 +169,11 @@ function createWeatherIconElement(weatherIcon, parent){
 }
 
 //Toggles between Grid view, and table list view
-function toggleDisplayMode(){
+function toggleDisplayMode() {
     flexgrid = document.getElementById('flexgrid');
     table = document.getElementById('table');
 
-    if(flexgrid.style.display == 'flex') {
+    if (flexgrid.style.display == 'flex') {
         flexgrid.style.display = 'none';
         table.style.display = 'block';
     } else {
@@ -182,8 +182,8 @@ function toggleDisplayMode(){
     }
 }
 
-//Creates the dropdow
-function createDropdownList(){
+//Creates the dropdown
+function createDropdownList() {
     parentSelector = document.getElementById('citySelector');
 
     cities.forEach(city => {
@@ -195,30 +195,42 @@ function createDropdownList(){
     });
 }
 
+function nextWeek() {
+    today = new Date();
+    return new Date(today.getFullYear(), today.getMonth(), today.getDate() + 7);
+}
+
 //Calls the functions after the page is done loading
-window.onload = function(){
+window.onload = function () {
     createDropdownList();
     getWeatherForCity();
 }
 
 //Gets weather for the selected city in the dropdown menu
-function getWeatherForCity(){
+function getWeatherForCity() {
     lat_lon = document.getElementById('citySelector').value;
     console.log(lat_lon);
 
     //Clears the elements
     clearTableAndFlex();
 
+    //Gets the weather data, and pushes the relevant data we want into a cleanWeatherData array
+    //For the table parameters to work, the key in the JSON object, needs to be named the same as the 'value' key, in the parameters array
     getWeatherData(lat_lon).then(
         weatherData => {
-            weatherData.properties.timeseries.forEach(element => {
+            for (let element of weatherData.properties.timeseries) {
                 date = new Date(element.time)
-    
+
+                //If the date is larger than next week (today + 7 days), break the loop
+                if (date > nextWeek()) {
+                    break;
+                }
+
                 cleanWeatherData.push({
                     time: (
-                        date.toLocaleDateString('en-US', {weekday: 'short', month: 'short', day: 'numeric'})
+                        date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
                         + " " +
-                        date.toLocaleTimeString('en-US',{hour12: false, hour: "numeric", minute: "numeric"})),
+                        date.toLocaleTimeString('en-US', { hour12: false, hour: "numeric", minute: "numeric" })),
                     air_temperature: element.data.instant.details.air_temperature,
                     wind_speed: element.data.instant.details.wind_speed,
                     wind_direction: element.data.instant.details.wind_from_direction,
@@ -226,8 +238,8 @@ function getWeatherForCity(){
                     precipitation: getPrecipitation(element),
                     weatherIcon: getWeatherIcon(element),
                 })
-            });
-    
+            };
+
             createFlexGrid();
             createHTMLTable();
         }
@@ -235,13 +247,13 @@ function getWeatherForCity(){
 }
 
 //Clears the table and flexgrid for new city
-function clearTableAndFlex(){
+function clearTableAndFlex() {
     table = document.getElementById('table')
     flexgrid = document.getElementById('flexgrid')
-    if(table !== null){
+    if (table !== null) {
         table.remove();
     }
-    if(flexgrid !== null){
+    if (flexgrid !== null) {
         flexgrid.remove();
     }
 }
